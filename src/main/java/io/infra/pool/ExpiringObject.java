@@ -1,39 +1,19 @@
-/**
- * Pingan.com Inc.
- * Copyright (c) 2004-2013 All Rights Reserved.
- */
 package io.infra.pool;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * 失效对象基类
- * @author lei.panglei
- * @version $Id: ExpiringObject.java, v 0.1 2013-1-15 上午10:03:57 lei.panglei Exp $
- */
 public abstract class ExpiringObject<K> extends Cachable<K> implements
-                                                           Comparable<ExpiringObject<K>> {
+        Comparable<ExpiringObject<K>> {
 
-    /** 失效时间 */
-    protected long          expiry       = 0L;
+    protected long expiry = 0L;
 
-    /** 失效时间同步锁 */
     protected ReadWriteLock expiringLock = new ReentrantReadWriteLock();
 
-    /**
-     * Expiry对象失效时间
-     * @param id
-     */
     public ExpiringObject(K id) {
         super(id);
     }
 
-    /**
-     * 获取失效时间
-     * 
-     * @return      返回失效时间
-     */
     public long getExpiring() {
         expiringLock.readLock().lock();
         try {
@@ -43,12 +23,6 @@ public abstract class ExpiringObject<K> extends Cachable<K> implements
         }
     }
 
-    /**
-     * 设置失效时间
-     * 失效时间小于等于0表示该对象永不失效
-     * 失效时间为毫秒计时的UNIX时间戳
-     * @param expiring  失效时间
-     */
     public void setExpiring(long expiring) {
         expiringLock.writeLock().lock();
         try {
@@ -58,13 +32,7 @@ public abstract class ExpiringObject<K> extends Cachable<K> implements
         }
     }
 
-    /**
-     * 判断对象是否失效
-     * 
-     * @return
-     */
     public boolean isExpiry() {
-
         // 失效时间加锁
         expiringLock.readLock().lock();
         try {
@@ -77,7 +45,6 @@ public abstract class ExpiringObject<K> extends Cachable<K> implements
                 return false;
             }
             return true;
-
         } finally {
             // 释放失效时间锁
             expiringLock.readLock().unlock();
